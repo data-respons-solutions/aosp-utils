@@ -1,0 +1,6 @@
+[submodule "core"]
+	path = core
+	url = https://android.googlesource.com/platform/system/core
+[submodule "libbase"]
+	path = libbase
+	url = https://android.googlesource.com/platform/system/libbase
