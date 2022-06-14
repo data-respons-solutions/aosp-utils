@@ -6,7 +6,7 @@ ifeq ($(abspath $(BUILD)),$(shell pwd))
 $(error "ERROR: Build dir can't be equal to source dir")
 endif
 
-all: simg2img img2simg append2simg
+all: simg2img img2simg append2simg simg2stdout
 
 LIBSPARSE_PATH = core/libsparse
 LIBSPARSE_SRCS := $(addprefix $(LIBSPARSE_PATH)/, backed_block.cpp output_file.cpp sparse.cpp sparse_crc32.cpp sparse_err.cpp sparse_read.cpp)
@@ -25,6 +25,9 @@ img2simg: $(BUILD)/$(LIBSPARSE_PATH)/img2simg
 .PHONY: append2simg
 append2simg: $(BUILD)/$(LIBSPARSE_PATH)/append2simg
 
+.PHONY: simg2stdout
+simg2stdout: $(BUILD)/simg2stdout
+
 $(BUILD)/$(LIBSPARSE_PATH)/simg2img: $(BUILD)/$(LIBSPARSE_PATH)/simg2img.o $(LIBBASE_OBJS) $(LIBSPARSE_OBJS)
 	$(CXX) -o $@ $^ -lz $(LDFLAGS)
 
@@ -34,10 +37,17 @@ $(BUILD)/$(LIBSPARSE_PATH)/img2simg: $(BUILD)/$(LIBSPARSE_PATH)/img2simg.o $(LIB
 $(BUILD)/$(LIBSPARSE_PATH)/append2simg: $(BUILD)/$(LIBSPARSE_PATH)/append2simg.o $(LIBBASE_OBJS) $(LIBSPARSE_OBJS)
 	$(CXX) -o $@ $^ -lz $(LDFLAGS)
 	
+$(BUILD)/simg2stdout: $(BUILD)/simg2stdout.o $(LIBBASE_OBJS) $(LIBSPARSE_OBJS)
+	$(CXX) -o $@ $^ -lz $(LDFLAGS)
+	
 $(BUILD)/$(LIBSPARSE_PATH)/%.o: $(LIBSPARSE_PATH)/%.cpp 
 	mkdir -p $(dir $@)
 	$(CXX) $(CFLAGS) -c $< -o $@
 
 $(BUILD)/$(LIBBASE_PATH)/%.o: $(LIBBASE_PATH)/%.cpp 
+	mkdir -p $(dir $@)
+	$(CXX) $(CFLAGS) -c $< -o $@
+	
+$(BUILD)/%.o: %.cpp 
 	mkdir -p $(dir $@)
 	$(CXX) $(CFLAGS) -c $< -o $@
